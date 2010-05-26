@@ -12,7 +12,7 @@ class DataTable
         index = /\d+/.match( method_name )[0]
         row( index )
       when /^(get_)?row_count$/
-        @rows.size
+        self.size
       when /^del(ete)?_row_\d+$/
         index = /\d+/.match( method_name )[0]
         delete_row( index )

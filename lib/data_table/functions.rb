@@ -6,7 +6,7 @@ class DataTable
     if type.eql?( 'columns' )
       # nothing
     else
-      @rows.sort! { |r1,r2| order.eql?( 'asc' ) ? r1[pointer] <=> r2[pointer] : r2[pointer] <=> r1[pointer] }
+      self.sort! { |r1,r2| order.eql?( 'asc' ) ? r1[pointer] <=> r2[pointer] : r2[pointer] <=> r1[pointer] }
     end
   end
 
@@ -14,9 +14,9 @@ class DataTable
     type, pointer = Validators.type_pointer( type, pointer )
 
     if type.eql?( 'columns' )
-      @rows.inject( 0 ) { |sum,row| sum += row[pointer] }
+      self.inject( 0 ) { |sum,row| sum += row[pointer] }
     else
-      @rows[pointer].inject( 0 ) { |sum,val| sum += val }
+      self[pointer].inject( 0 ) { |sum,val| sum += val }
     end
   end
 
@@ -24,9 +24,9 @@ class DataTable
     type, pointer = Validators.type_pointer( type, pointer )
 
     if type.eql?( 'columns' )
-      sum( type, pointer ).to_f / @rows.size.to_f
+      sum( type, pointer ).to_f / self.size.to_f
     else
-      sum( 'rows', pointer ).to_f / @rows[pointer].size.to_f
+      sum( 'rows', pointer ).to_f / self[pointer].size.to_f
     end
   end
 
@@ -44,9 +44,9 @@ class DataTable
     type, pointer = Validators.type_pointer( type, pointer )
 
     if type.eql?( 'columns' )
-      @rows.inject( 0 ) { |max,row| row[pointer].to_f.send( op, max ) ? row[pointer].to_f : max }
+      self.inject( 0 ) { |max,row| row[pointer].to_f.send( op, max ) ? row[pointer].to_f : max }
     else
-      @rows[pointer].inject( 0 ) { |max,val| val.to_f.send( op, max ) ? val : max }
+      self[pointer].inject( 0 ) { |max,val| val.to_f.send( op, max ) ? val : max }
     end
   end
 

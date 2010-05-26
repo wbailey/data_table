@@ -1,4 +1,4 @@
-$: << File.dirname( File.join( __FILE__, '..' ) )
+$: << File.join( File.dirname( __FILE__ ), '../lib' )
 
 require 'rubygems'
 require 'spec/test/unit'
@@ -23,9 +23,9 @@ describe DataTable do
       subject.header.should be_array
     end
 
-    it 'set rows to new Array' do
-      subject.rows.should be_array
-    end
+    #it 'set rows to new Array' do
+    #  subject.rows.should be_array
+    #end
   end
 
   context "Header Properties" do
@@ -266,4 +266,16 @@ describe DataTable do
       subject.max( 'col', 2 ).should == 9
     end
   end
+
+  context "Convert to String" do
+    it "should convert to string" do
+      subject.header = %w( a b c )
+      subject.add_row [1,2,3]
+      subject.add_row [4,5,6]
+      subject.add_row [7,8,9]
+
+      subject.to_s.should == "1 2 3\n4 5 6\n7 8 9\n"
+    end
+  end
+
 end

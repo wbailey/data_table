@@ -15,7 +15,7 @@ class DataTable
           when 'first'
             index = order.eql?( :before ) ? 0 : 1
           when 'last'
-            index = order.eql?( :after ) ? -1 : @rows.size - 1
+            index = order.eql?( :after ) ? -1 : self.size - 1
           when /\d+/
             index = order.eql?( :before ) ? value : value + 1
         end
@@ -24,15 +24,15 @@ class DataTable
     end
 
     # By default the array will substitute undefined values with nil when the index is out of bounds
-    index = @rows.size if index > @rows.size
+    index = self.size if index > self.size
 
-    @rows.insert( index, row )
+    self.insert( index, row )
   end
 
   def row( index = 0 )
-    raise UndefinedTable if @rows.empty?
+    raise UndefinedTable if self.empty?
 
-    if row = @rows[index.to_i]
+    if row = self[index.to_i]
       row
     else
       raise UndefinedRow
@@ -42,6 +42,6 @@ class DataTable
   def delete_row( index = 0 )
     row( index )
 
-    @rows.delete_at( index.to_i )
+    self.delete_at( index.to_i )
   end
 end  
