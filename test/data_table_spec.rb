@@ -13,19 +13,15 @@ end
 
 describe DataTable do
   context "Instantiation" do
-    it 'raise an exception when constructor is called with arguments' do
+    it 'raise an exception when constructor argument is not Array' do
       lambda {
         DataTable.new( 'x' )
-      }.should raise_error( ArgumentError, /wrong number of arguments \(\d for 0\)/ )
+      }.should raise_error( ArgumentError )
     end
 
     it 'set header to new Array' do
       subject.header.should be_array
     end
-
-    #it 'set rows to new Array' do
-    #  subject.rows.should be_array
-    #end
   end
 
   context "Header Properties" do
@@ -267,15 +263,13 @@ describe DataTable do
     end
   end
 
-  context "Convert to String" do
-    it "should convert to string" do
-      subject.header = %w( a b c )
-      subject.add_row [1,2,3]
-      subject.add_row [4,5,6]
-      subject.add_row [7,8,9]
+  it "convert to string" do
+    subject.header = %w( a b c )
+    subject.add_row [1,2,3]
+    subject.add_row [4,5,6]
+    subject.add_row [7,8,9]
 
-      subject.to_s.should == "1 2 3\n4 5 6\n7 8 9\n"
-    end
+    subject.to_s.should == "a b c\n1 2 3\n4 5 6\n7 8 9\n"
   end
 
 end
