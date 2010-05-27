@@ -1,8 +1,7 @@
-require 'rubygems'
-require 'spec'
-require 'spec/rake/spectask'
+$: << File.join( ENV['HOME'], 'shared' )
 
-Spec::Rake::SpecTask.new do |t|
-  t.spec_opts = %w( -cfn )
-  t.spec_files = FileList[ 'test/**/*_spec.rb' ]
-end
+@@version='0.1.0'
+@@package = 'data_table'
+@@summary = 'A class that provides spreadsheet operations and functions on a source agnostic data set'
+
+require 'rakefile'

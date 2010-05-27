@@ -11,13 +11,13 @@ class DataTable < Array
     @header = Array.new
   end
 
+  def to_s
+    self.inject( '' ) { |s,row| s << row.join( ' ' ) + "\n" }
+  end
+
   require 'data_table/exceptions'
   require 'data_table/header'
   require 'data_table/row'
   require 'data_table/functions'
   require 'data_table/method_missing'
-
-  def to_s
-    self.inject( '' ) { |s,row| s << row.join( ' ' ) + "\n" }
-  end
 end
