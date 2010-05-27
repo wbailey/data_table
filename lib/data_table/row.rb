@@ -1,5 +1,5 @@
 class DataTable
-  def add_row( row, options = { :after => 'last' } )
+  def add_row( row, options = { :after => :last } )
     raise UndefinedHeader unless valid_header?
     raise InvalidRow unless row.is_a?( Array )
     raise InvalidRowSize unless row.size.eql?( @header.size )
@@ -11,7 +11,7 @@ class DataTable
       when :before, :after
         raise InvalidRowIndex unless /^(first|last|\d+)$/.match( value.to_s )
 
-        case value
+        case value.to_s
           when 'first'
             index = order.eql?( :before ) ? 0 : 1
           when 'last'

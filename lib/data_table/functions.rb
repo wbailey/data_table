@@ -1,49 +1,49 @@
 class DataTable
-  def sort( type = 'rows', pointer = 0, order = 'asc' )
+  def sort( type = :rows, pointer = 0, order = :asc )
     type, pointer = Validators.type_pointer( type, pointer )
-    raise UndefinedSortOrder unless /^(desc|asc)$/.match( order )
+    raise UndefinedSortOrder unless /^(desc|asc)$/.match( order.to_s )
 
-    if type.eql?( 'columns' )
+    if type.eql?( :columns )
       # nothing
     else
-      self.sort! { |r1,r2| order.eql?( 'asc' ) ? r1[pointer] <=> r2[pointer] : r2[pointer] <=> r1[pointer] }
+      self.sort! { |r1,r2| order.eql?( :asc ) ? r1[pointer] <=> r2[pointer] : r2[pointer] <=> r1[pointer] }
     end
   end
 
-  def sum( type = 'colums', pointer = 0 )
+  def sum( type = :columns, pointer = 0 )
     type, pointer = Validators.type_pointer( type, pointer )
 
-    if type.eql?( 'columns' )
+    if type.eql?( :columns )
       self.inject( 0 ) { |sum,row| sum += row[pointer] }
     else
       self[pointer].inject( 0 ) { |sum,val| sum += val }
     end
   end
 
-  def avg( type = 'columns', pointer = 0 )
+  def avg( type = :columns, pointer = 0 )
     type, pointer = Validators.type_pointer( type, pointer )
 
-    if type.eql?( 'columns' )
+    if type.eql?( :columns )
       sum( type, pointer ).to_f / self.size.to_f
     else
-      sum( 'rows', pointer ).to_f / self[pointer].size.to_f
+      sum( :rows, pointer ).to_f / self[pointer].size.to_f
     end
   end
 
-  def max( type = 'columns', pointer = 0 )
+  def max( type = :columns, pointer = 0 )
     maxmin( '>', type, pointer)
   end
 
-  def min( type = 'columns', pointer = 0 )
+  def min( type = :columns, pointer = 0 )
     maxmin( '<', type, pointer)
   end
 
   private
 
-  def maxmin( op, type = 'columns', pointer = 0 ) 
+  def maxmin( op, type = :columns, pointer = 0 ) 
     type, pointer = Validators.type_pointer( type, pointer )
 
-    if type.eql?( 'columns' )
+    if type.eql?( :columns )
       self.inject( 0 ) { |max,row| row[pointer].to_f.send( op, max ) ? row[pointer].to_f : max }
     else
       self[pointer].inject( 0 ) { |max,val| val.to_f.send( op, max ) ? val : max }
@@ -53,11 +53,11 @@ class DataTable
   class Validators
     class << self
       def type_pointer( type, pointer )
-        case type
+        case type.to_s
           when /^colu?m?n?s?$/i
-            type = 'columns'
+            type = :columns
           when /^rows?$/i
-            type = 'rows'
+            type = :rows
           else
             raise UndefinedFunctionType
         end
