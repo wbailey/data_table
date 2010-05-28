@@ -8,6 +8,10 @@ class DataTable
   end
 
   def to_s
-    @header.join( ' ' ) + "\n" + self.inject( '' ) { |s,row| s << row.join( ' ' ) + "\n" }
+    if self.empty?
+      @header.empty? ? '' : @header.join( ' ' )
+    else
+      @header.join( ' ' ) + "\n" + self.inject( '' ) { |s,row| s << row.join( ' ' ) + "\n" }
+    end
   end
 end
