@@ -1,49 +1,38 @@
+require 'function/factory'
+
 class DataTable
-  def sort( type = :rows, pointer = 0, order = :asc )
-    type, pointer = Validators.type_pointer( type, pointer )
-    raise UndefinedSortOrder unless /^(desc|asc)$/.match( order.to_s )
-
-    if type.eql?( :columns )
-      # nothing
-    else
-      self.sort! { |r1,r2| order.eql?( :asc ) ? r1[pointer] <=> r2[pointer] : r2[pointer] <=> r1[pointer] }
-    end
+  def sort( type = :row, pointer = 0, order = :asc )
+    FunctionFactory.new( type, self ).sort( pointer, order )
   end
 
-  def sum( type = :columns, pointer = 0 )
-    type, pointer = Validators.type_pointer( type, pointer )
-
-    if type.eql?( :columns )
-      self.inject( 0 ) { |sum,row| sum += row[pointer] }
-    else
-      self[pointer].inject( 0 ) { |sum,val| sum += val }
-    end
+  def sum( type = :column, pointer = 0 )
+    FunctionFactory.new( type, self ).sum( pointer )
   end
 
-  def avg( type = :columns, pointer = 0 )
+  def avg( type = :column, pointer = 0 )
     type, pointer = Validators.type_pointer( type, pointer )
 
-    if type.eql?( :columns )
+    if type.eql?( :column )
       sum( type, pointer ).to_f / self.size.to_f
     else
-      sum( :rows, pointer ).to_f / self[pointer].size.to_f
+      sum( :row, pointer ).to_f / self[pointer].size.to_f
     end
   end
 
-  def max( type = :columns, pointer = 0 )
+  def max( type = :column, pointer = 0 )
     maxmin( '>', type, pointer)
   end
 
-  def min( type = :columns, pointer = 0 )
+  def min( type = :column, pointer = 0 )
     maxmin( '<', type, pointer)
   end
 
   private
 
-  def maxmin( op, type = :columns, pointer = 0 ) 
+  def maxmin( op, type = :column, pointer = 0 ) 
     type, pointer = Validators.type_pointer( type, pointer )
 
-    if type.eql?( :columns )
+    if type.eql?( :column )
       self.inject( 0 ) { |max,row| row[pointer].to_f.send( op, max ) ? row[pointer].to_f : max }
     else
       self[pointer].inject( 0 ) { |max,val| val.to_f.send( op, max ) ? val : max }

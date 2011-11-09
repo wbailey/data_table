@@ -1,7 +1,7 @@
-$: << File.join( File.dirname( __FILE__ ), '../lib' )
+$: << File.dirname( File.join( __FILE__, '..' ) )
 
 require 'rubygems'
-require 'rspec'
+require 'spec/test/unit'
 require 'data_table'
 
 # Sneaky
@@ -13,14 +13,18 @@ end
 
 describe DataTable do
   context "Instantiation" do
-    it 'raise an exception when constructor argument is not Array' do
+    it 'raise an exception when constructor is called with arguments' do
       lambda {
         DataTable.new( 'x' )
-      }.should raise_error( ArgumentError )
+      }.should raise_error( ArgumentError, /wrong number of arguments \(\d for 0\)/ )
     end
 
     it 'set header to new Array' do
       subject.header.should be_array
+    end
+
+    it 'set rows to new Array' do
+      subject.rows.should be_array
     end
   end
 
@@ -40,10 +44,7 @@ describe DataTable do
     end
 
     it "create a valid header" do
-      lambda {
-        subject.header = %w( a b c )
-      }.should_not raise_error
-
+      subject.header = %w( a b c )
       subject.header.should == %w( a b c )
     end
   end
@@ -160,118 +161,5 @@ describe DataTable do
       subject.add_row( [1,2,3] )
       subject.get_row_count.should == 1
     end
-
-    it "raise exception when removing row and no rows have been defined" do
-      lambda {
-        subject.delete_row( 2 )
-      }.should raise_error( DataTable::UndefinedTable )
-    end
-
-    it "raise exception when removing row with an invalid index" do
-      lambda {
-        subject.add_row( [1,2,3] )
-        subject.delete_row( 2 )
-      }.should raise_error( DataTable::UndefinedRow )
-    end
-
-    it "remove row at specified index" do
-      subject.add_row( [1,2,3] )
-      subject.add_row( [4,5,6] )
-      subject.add_row( [7,8,9] )
-      subject.delete_row( 2 ).should == [7,8,9]
-      subject.delete_row( 1 ).should == [4,5,6]
-    end
-
-    it "remove row at specified index dynamically" do
-      subject.add_row( [1,2,3] )
-      subject.add_row( [4,5,6] )
-      subject.add_row( [7,8,9] )
-      subject.del_row_2.should == [7,8,9]
-      subject.delete_row_1.should == [4,5,6]
-    end
   end
-
-  context 'Row Operations' do
-    before :each do
-      subject.header = %w( a b c )
-      subject.add_row( [1,2,3] )
-      subject.add_row( [4,5,6] )
-      subject.add_row( [7,8,9] )
-    end
-
-    it "raise exeption if type is invalid" do
-      lambda {
-        subject.sort( 'asdf', 2, 'desc' )
-      }.should raise_error( FunctionFactory::UndefinedFunctionType )
-    end
-
-    it "raise exception if pointer is invalid" do
-      lambda {
-        subject.sort( :column, 'asdf', 'desc' )
-      }.should raise_error( Function::UndefinedPointer )
-    end
-
-    it "raise exception if sort order is invalid" do
-      lambda {
-        subject.sort( :column, 2, 'adsf' )
-      }.should raise_error( Function::UndefinedSortOrder )
-    end
-
-    it "sort rows in descending order on column 2" do
-      subject.sort( :row, 2, 'desc' )
-      subject.get_first_row.should == [7,8,9]
-      subject.get_last_row.should == [1,2,3]
-    end
-
-    it "sort rows in ascending order on column 1" do
-      subject.sort( :row, 1 )
-      subject.get_first_row.should == [1,2,3]
-      subject.get_last_row.should == [7,8,9]
-    end
-
-    it "sort rows in ascending order using defaults" do
-      subject.sort( :row, 2, :desc )
-      subject.sort
-      subject.get_first_row.should == [1,2,3]
-      subject.get_last_row.should == [7,8,9]
-    end
-
-    it "sum columns" do
-      subject.sum( :col ).should == 12
-      subject.sum( :col, 1 ).should == 15
-      subject.sum( :col, 2 ).should == 18
-    end
-
-    it "average columns" do
-      subject.avg( :col ).should == 4.0
-      subject.avg( :col, 1 ).should == 5.0
-      subject.avg( :col, 2 ).should == 6.0
-      subject.add_row( [10,11,12] )
-      subject.avg( :col ).should == 5.5
-      subject.avg( :col, 1 ).should == 6.5
-      subject.avg( :col, 2 ).should == 7.5
-      subject.delete_row( 0 )
-      subject.avg( :col ).should == 7.0
-      subject.avg( :col, 1 ).should == 8.0
-      subject.avg( :col, 2 ).should == 9.0
-    end
-
-    it "select max numerical value" do
-      subject.max( :col ).should == 7
-      subject.max( :col, 1 ).should == 8
-      subject.max( :col, 2 ).should == 9
-    end
-  end
-
-  it "convert to string" do
-    subject.to_s.should == "\n"
-
-    subject.header = %w( a b c )
-    subject.add_row [1,2,3]
-    subject.add_row [4,5,6]
-    subject.add_row [7,8,9]
-
-    subject.to_s.should == "a b c\n1 2 3\n4 5 6\n7 8 9\n"
-  end
-
 end

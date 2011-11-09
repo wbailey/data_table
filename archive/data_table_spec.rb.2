@@ -1,0 +1,124 @@
+$: << File.dirname( File.join( __FILE__, '..' ) )
+
+require 'rubygems'
+require 'spec/test/unit'
+require 'data_table'
+
+# Sneaky
+class Object
+  def array?
+    self.is_a?( Array )
+  end
+end
+
+describe DataTable do
+  context "Instantiation" do
+    it 'raise an ArgumentError when constructor is called with arguments' do
+      lambda {
+        DataTable.new( 'x' )
+      }.should raise_error( ArgumentError, /wrong number of arguments \(\d for 0\)/ )
+    end
+
+    it 'set header to new Array' do
+      subject.header.should be_array
+    end
+
+    it 'set rows to new Array' do
+      subject.rows.should be_array
+    end
+  end
+
+  context "Header Properties" do
+    it "raise an ArgumentError when header is not valid" do
+      lambda {
+        subject.header = "a b c"
+      }.should raise_error( DataTable::InvalidHeader )
+
+      lambda {
+        subject.header = [ "a", "b", 3 ]
+      }.should raise_error( DataTable::InvalidHeader )
+    end
+
+    it "create a valid header" do
+      subject.header = %w( a b c )
+      subject.header.should == %w( a b c )
+    end
+  end
+
+  context "Row Properties" do
+    before :each do
+      subject.header = %w( a b c )
+    end
+
+    it "raise exception when header is not yet defined" do
+      lambda {
+        subject.header = Array.new
+        subject.add_row( 'asdf' )
+      }.should raise_error( DataTable::InvalidHeader )
+    end
+
+    it 'raise exception when row is not an Array' do
+      lambda {
+        subject.add_row( 'asdf' )
+      }.should raise_error( DataTable::InvalidRow )
+    end
+
+    it "raise exception when row size does not match header size" do
+      lambda {
+        subject.add_row( [1,2] )
+      }.should raise_error( DataTable::InvalidRowSize )
+    end
+
+    it 'raise exception when options is not a Hash' do
+      lambda {
+        subject.add_row( [1,2,3], 'asdf' )
+      }.should raise_error( DataTable::InvalidAddOption )
+    end
+
+    it 'raise exception when options has more than 1 key' do
+      lambda {
+        subject.add_row( [1,2,3], :before => 0, :after => 1 )
+      }.should raise_error( DataTable::InvalidAddOption )
+    end
+
+    it 'raise exception when options key is not :before or :after' do
+      lambda {
+        subject.add_row( [1,2,3], :asdf => 0 )
+      }.should raise_error( DataTable::InvalidAddOption )
+    end
+
+    it "raise exception when option value is not 'first', 'last', or valid numerical index" do
+      lambda {
+        subject.add_row( [1,2,3], :before => 'asdf' )
+      }.should raise_error( DataTable::InvalidRowIndex )
+    end
+
+    it "increase row count and add last row" do
+      subject.add_row( [1,2,3] )
+      subject.row_count.should == 1
+      subject.last_row.should == [1,2,3]
+
+      # This is equivalent to the default
+      subject.add_row( [4,5,6], :after => 'last' )
+      subject.row_count.should == 2
+      subject.last_row.should == [4,5,6]
+    end
+
+
+    it "increase row count and add row after first" do
+      subject.add_row( [1,2,3] )
+      subject.add_row( [4,5,6] )
+      subject.add_row( [7,8,9], :after => 'first' )
+      subject.row_count.should == 3
+      subject.get_row( 1 ).should == [7,8,9]
+    end
+
+    it "increase row count and create row before last" do
+      subject.add_row( [1,2,3] )
+      subject.add_row( [4,5,6] )
+      subject.add_row( [7,8,9], :before => 'last' )
+      subject.row_count.should == 3
+      subject.get_row( 1 ).should == [7,8,9]
+    end
+  end
+end

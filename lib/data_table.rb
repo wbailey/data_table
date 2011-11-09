@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'define_exception'
+require 'singleton'
 
 include DefineException
 

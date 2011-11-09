@@ -1,3 +1,4 @@
+# Setup object construction and default behaviors
 class DataTable
   attr_reader :header
 
@@ -8,10 +9,6 @@ class DataTable
   end
 
   def to_s
-    if self.empty?
-      @header.empty? ? '' : @header.join( ' ' )
-    else
-      @header.join( ' ' ) + "\n" + self.inject( '' ) { |s,row| s << row.join( ' ' ) + "\n" }
-    end
+    @header.join( ' ' ) + self.inject( "\n" ) { |str,row| str << row.join( ' ' ) + "\n" }
   end
 end
